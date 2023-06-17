@@ -1,10 +1,13 @@
-// Rubber_Cube_03
+// Rubber_Cube_04
 
-VBox vb0;
+VBox box;
 
 void setup() {
   size(800, 600, P3D);
-  vb0 = new VBox(200, 200, 200);
+  box = new VBox(200, 200, 200);
+  
+  // void push(int index, PVector v)
+  box.push(0, new PVector(.1, .1, .1));
 }
 
 void draw() {
@@ -15,7 +18,9 @@ void draw() {
   rotateZ(frameCount*PI/360);
   fill(200);
   //noStroke();
+  box.move();
   
-  vb0.draw();
-  vb0.drawVBalls();
+  
+  box.draw();
+ // box.drawVBalls();
 }

@@ -43,7 +43,7 @@ Face3[] faces = new Face3[12];
 
 void setup() {
   size(800, 600, P3D);
-  for (int i=0; i< inds.length; i++) {
+  for (int i=0; i<inds.length; i++) {
     faces[i] = new Face3(verts[inds[i][0]], verts[inds[i][1]], verts[inds[i][2]]);
   }
 }
@@ -55,7 +55,7 @@ void draw() {
   rotateY(frameCount*PI/360);
   rotateZ(frameCount*PI/360);
   fill(200);
-  noStroke();
+  //noStroke();
   for (int i=0; i< faces.length; i++) {
     faces[i].draw(150);
   }

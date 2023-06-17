@@ -9,13 +9,12 @@ class VBall {
   VBall(PVector pos, float radius){
     this.pos = pos;
     this.radius = radius;
-    this.posOld  = new PVector(pos.x, pos.y);
+    this.posOld  = new PVector(pos.x, pos.y, pos.z);
   }
 
   void push(PVector push_vec){
     this.pos.add(push_vec);
   }
-  
   
   void verlet(){
     PVector posTemp = new PVector(pos.x, pos.y, pos.z);
