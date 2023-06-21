@@ -24,9 +24,11 @@ class VBall {
     posOld.set(posTemp);
   }
 
-  void draw(){
+  void draw(color _fill){
     pushMatrix();
     translate(pos.x, pos.y, pos.z);
+    noStroke();
+    fill(_fill);
     sphere(radius*2);
     popMatrix();
   }

@@ -2,7 +2,7 @@ class VBox {
 
   /*
      6------7
-   /|     /|
+    /|     /|
    3-|----2 |
    | |    | |
    | 5----|-4
@@ -10,25 +10,40 @@ class VBox {
    0------1
    */
 
-
   PVector dim;
+  PVector elasticityRange;
+  
+  Tup2i[] contours = {
+    new Tup2i(0, 1),
+    new Tup2i(1, 2),
+    new Tup2i(2, 3),
+    new Tup2i(3, 0),
+    new Tup2i(6, 7),
+    new Tup2i(7, 4),
+    new Tup2i(4, 5),
+    new Tup2i(5, 6),
+    new Tup2i(0, 5),
+    new Tup2i(1, 4),
+    new Tup2i(2, 7),
+    new Tup2i(3, 6)
+  };
 
   // the 8 unique vertices in the cube
   PVector[] verts = new PVector[8];
 
-  Tupi[] inds = {
-    new Tupi(0, 5, 1),
-    new Tupi(1, 5, 4),
-    new Tupi(4, 2, 1),
-    new Tupi(4, 7, 2),
-    new Tupi(6, 7, 5),
-    new Tupi(7, 4, 5),
-    new Tupi(0, 3, 5),
-    new Tupi(5, 3, 6),
-    new Tupi(0, 2, 3),
-    new Tupi(0, 1, 2),
-    new Tupi(3, 7, 6),
-    new Tupi(3, 2, 7)
+  Tup3i[] inds = {
+    new Tup3i(0, 5, 1),
+    new Tup3i(1, 5, 4),
+    new Tup3i(4, 2, 1),
+    new Tup3i(4, 7, 2),
+    new Tup3i(6, 7, 5),
+    new Tup3i(7, 4, 5),
+    new Tup3i(0, 3, 5),
+    new Tup3i(5, 3, 6),
+    new Tup3i(0, 2, 3),
+    new Tup3i(0, 1, 2),
+    new Tup3i(3, 7, 6),
+    new Tup3i(3, 2, 7)
   };
 
   Face3[] faces = new Face3[12];
@@ -36,14 +51,14 @@ class VBox {
   VBall[] vbs = new VBall[8];
 
   // all surface sticks
-  VStick[] vss = new VStick[18];
-
+  ArrayList<VStick> vss = new ArrayList<VStick>();
 
   VBox() {
   }
 
-  VBox(PVector dim) {
+  VBox(PVector dim, PVector elasticityRange) {
     this.dim = dim;
+    this.elasticityRange = elasticityRange;
 
     verts[0] = new PVector(-.5*this.dim.x, .5*this.dim.y, .5*this.dim.z); //0
     verts[1] = new PVector(.5*this.dim.x, .5*this.dim.y, .5*this.dim.z); //1
@@ -59,27 +74,23 @@ class VBox {
       vbs[i] = new VBall(verts[i], 5);
     }
 
-     //= new VStick(vbs[0], vbs[1], .0001);
-
-    for (int i=0, k=0; i<8; i++) {
-      for (int j=i; j<7; j++) {
-      // vss[k++] =  new VStick(vbs[i], vbs[j+1], .0001);
-      println("k== " + k);
-      k++;
-      }
-    }
-
     create();
   }
 
   // convenience cstr
-  VBox(float w, float h, float d) {
-    this(new PVector(w, h, d));
+  VBox(float w, float h, float d, PVector elasticityRange) {
+    this(new PVector(w, h, d), elasticityRange);
   }
 
   void create() {
     for (int i=0; i< inds.length; i++) {
       faces[i] = new Face3(verts[inds[i].i0], verts[inds[i].i1], verts[inds[i].i2]);
+    }
+
+    for (int i=0; i<vbs.length; i++) {
+      for (int j=i; j<vbs.length-1; j++) {
+        vss.add(new VStick(vbs[i], vbs[j+1], random(elasticityRange.x, elasticityRange.y)));
+      }
     }
   }
 
@@ -93,34 +104,82 @@ class VBox {
     }
   }
 
-
-  void move() {
-    for (int i=0; i<vbs.length; i++) {
-      //PVector pos, float radius
-      vbs[i].verlet();
-    }
-
-    for (int i=0; i<vss.length; i++) {
-    //  vss[i].constrainLen();
+  // requires parallel arrays
+  void push(int[] indices, PVector[] vs) {
+    for (int i=0; i<indices.length; i++) {
+      vbs[ indices[i] ].push(vs[i]);
     }
   }
 
 
-  void draw() {
+  void move() {
+    for (int i=0; i<vbs.length; i++) {
+      vbs[i].verlet();
+    }
+
+    for (int i=0; i<vss.size(); i++) {
+      vss.get(i).constrainLen();
+    }
+  }
+
+
+  void draw(color _fill) {
+    noStroke();
+    fill(_fill);
     for (int i=0; i< faces.length; i++) {
       faces[i].draw();
     }
   }
 
-  void drawVBalls() {
+  void drawContour(color _stroke) {
+    noFill();
+    stroke(_stroke);
+    beginShape(LINES);
+    for (int i=0; i<contours.length; i++) {
+      vertex(verts[contours[i].i0].x, verts[contours[i].i0].y, verts[contours[i].i0].z);
+      vertex(verts[contours[i].i1].x, verts[contours[i].i1].y, verts[contours[i].i1].z);
+    }
+    endShape();
+  }
+
+  void drawVBalls(color _fill) {
     for (int i=0; i< vbs.length; i++) {
-      vbs[i].draw();
+      vbs[i].draw(_fill);
     }
   }
 
-  void drawVSticks() {
-    for (int i=0; i< vss.length; i++) {
-    //  vss[i].draw();
+  void drawVSticks(color _stroke) {
+    noFill();
+    for (int i=0; i<vss.size(); i++) {
+      vss.get(i).draw(_stroke);
+    }
+  }
+
+  void constrainBounds(PVector bounds, float offset) {
+    for (int i=0; i<verts.length; i++) {
+      if (verts[i].x >= bounds.x/2) {
+        verts[i].x = bounds.x/2;
+        verts[i].x -= offset;
+      } else if (verts[i].x <= -bounds.x/2) {
+        verts[i].x = -bounds.x/2;
+        verts[i].x += offset;
+      }
+
+      if (verts[i].y >= bounds.y/2) {
+        verts[i].y = bounds.y/2;
+        verts[i].y -= offset;
+      } else if (verts[i].y <= -bounds.y/2) {
+        verts[i].y = -bounds.y/2;
+        verts[i].y += offset;
+      }
+
+      if (verts[i].z >= bounds.z/2) {
+        verts[i].z = bounds.z/2;
+        verts[i].z -= offset;
+      } else if (verts[i].z <= -bounds.z/2) {
+        verts[i].z = -bounds.z/2;
+        verts[i].z += offset;
+      }
     }
   }
 }

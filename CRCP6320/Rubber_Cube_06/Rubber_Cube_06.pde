@@ -3,28 +3,36 @@
 VBox box;
 
 void setup() {
-  size(800, 600, P3D);
-  box = new VBox(200, 200, 200);
-  
- // box.push(0, new PVector(.1, .1, .1));
-  
-//int[] inds = {0, 6};
-  box.push(new int[]{0}, new PVector(.8, .8, .8));
- // box.push(inds, new PVector(.8, .8, .8));
+  size(1000, 800, P3D);
+  box = new VBox(200, 200, 200, new PVector(.001, .008));
+
+  int[] inds = {0, 2, 4, 6};
+  float vecsMax = 5;
+  PVector[] vecs = {
+    new PVector(random(-vecsMax, vecsMax), random(-vecsMax, vecsMax), random(-vecsMax, vecsMax)),
+    new PVector(random(-vecsMax, vecsMax), random(-vecsMax, vecsMax), random(-vecsMax, vecsMax)),
+    new PVector(random(-vecsMax, vecsMax), random(-vecsMax, vecsMax), random(-vecsMax, vecsMax)),
+    new PVector(random(-vecsMax, vecsMax), random(-vecsMax, vecsMax), random(-vecsMax, vecsMax))
+  };
+  //box.push(new int[]{0}, new PVector(4.8, 4.8, 4.8));
+  //box.push(inds, new PVector(2.8, 2.8, 2.8));
+  box.push(inds, vecs);
 }
 
 void draw() {
-  background(125);
+  background(0);
   lights();
-  translate(width/2, height/2);
-  rotateY(frameCount*PI/360);
-  rotateZ(frameCount*PI/360);
-  fill(200);
-  //noStroke();
+  translate(width/2, height/2, -150);
+  rotateY(frameCount*PI/1360);
+  rotateZ(frameCount*PI/1360);
+  noFill();
+  stroke(255, 75);
+  box(600);
+
   box.move();
-  
-  
-  box.draw();
-  box.drawVBalls();
-  box.drawVSticks();
+  box.draw(color(100, 80, 135, 100));
+  box.drawContour(color(255, 0, 0));
+  box.drawVBalls(color(50, 125, 175));
+  //box.drawVSticks(color(255, 255, 0));
+  box.constrainBounds(new PVector(600, 600, 600), 7);
 }

@@ -1,5 +1,5 @@
 class VStick {
-  
+
   VBall b0, b1;
   float tension;
 
@@ -17,11 +17,14 @@ class VStick {
     len = dist(b0.pos.x, b0.pos.y, b0.pos.z, b1.pos.x, b1.pos.y, b1.pos.z);
   }
 
-  void draw() {
-      beginShape();
-      vertex(b0.pos.x, b0.pos.y, b0.pos.z);
-      vertex(b1.pos.x, b1.pos.y, b1.pos.z);
-      endShape();
+  void draw(color _stroke) {
+    noFill();
+    stroke(_stroke);
+    // line(b0.pos.x, b0.pos.y, b0.pos.z, b1.pos.x, b1.pos.y, b1.pos.z);
+    beginShape(LINES);
+    vertex(b0.pos.x, b0.pos.y, b0.pos.z);
+    vertex(b1.pos.x, b1.pos.y, b1.pos.z);
+    endShape();
   }
 
   void constrainLen() {
